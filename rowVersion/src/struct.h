@@ -1,10 +1,11 @@
 #ifndef __STRUCT__
 #define __STRUCT__
-#define PRINT
+//#define PRINT
 
 #define _Ncores 16 
 #define _Nelem 256
-#define _Nside 64
+//#define _Nside 16
+#define _Nrows 16
 
 typedef struct {
     unsigned coreID;
@@ -20,7 +21,7 @@ typedef struct {
     unsigned colv;
     unsigned colvnext;
 
-	char _grid[2][_Nside*_Nside];
+	char _grid[2][_Nelem*_Nrows];
 } core_t;
 
 typedef struct {

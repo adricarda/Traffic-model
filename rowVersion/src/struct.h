@@ -4,24 +4,18 @@
 
 #define _Ncores 16 
 #define _Nelem 256
-//#define _Nside 16
-#define _Nrows 16
 
 typedef struct {
     unsigned coreID;
     unsigned corenum;
     unsigned row;
     unsigned col;
-    unsigned rowh;
-    unsigned rowhnext;
-    unsigned colh;
-    unsigned colhnext;
-    unsigned rowv;
-    unsigned rowvnext;
-    unsigned colv;
-    unsigned colvnext;
+    unsigned row_next;
+    unsigned col_next;
+    unsigned row_previous;
+    unsigned col_previous;
 
-	char _grid[2][_Nelem*_Nrows];
+	char _grid[2][_Nelem* (_Nelem/_Ncores)];
 } core_t;
 
 typedef struct {

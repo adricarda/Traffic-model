@@ -139,7 +139,6 @@ int main(void)
 {
 	volatile shared_buf_ptr_t Mailbox;
     int nsteps;
-	float elapsed;
     e_dma_desc_t smem2local ;
     e_dma_desc_t hneigh2local ;
     e_dma_desc_t vneigh2local ;
@@ -148,7 +147,8 @@ int main(void)
     volatile e_barrier_t *tgt_bars[_Ncores];
     int i,j,k;
 	volatile unsigned *go, *ready; 
-    char upper_row[_Nside];
+ 	unsigned *elapsed;
+	char upper_row[_Nside];
     char lower_row[_Nside];
     char left_column[_Nside];
     char right_column[_Nside];
@@ -161,6 +161,7 @@ int main(void)
 	//initialization
 	go = (unsigned *) 0x7000;//Done flag
 	ready = (unsigned *) 0x7010;//ready flag to signal end of computation
+	elapsed = (unsigned *) 0x7020;
 
     me.coreID = e_get_coreid();
     me.row = e_group_config.core_row;
@@ -187,7 +188,8 @@ int main(void)
 	// Make sure DMA is inactive while setting descriptors
 	e_dma_wait(E_DMA_0);
 
-	smem2local.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
+	//smem2local.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
+	smem2local.config = E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
     smem2local.inner_stride = (0x04 << 16) | 0x04;
     smem2local.count = (_Nside << 16) | _Nside >> 2 ;
     smem2local.outer_stride = (0x04 << 16) | (((_Nelem - _Nside) * sizeof(char)) + 0x04); 
@@ -212,6 +214,8 @@ int main(void)
 //	e_mutex_unlock(0, 0, &mutex);	
 	e_barrier(barriers, tgt_bars);
 
+	e_ctimer_set(E_CTIMER_0, E_CTIMER_MAX);
+	e_ctimer_start(E_CTIMER_0, E_CTIMER_CLK);
 
 for(k=1; k<nsteps; k++){
 
@@ -230,24 +234,34 @@ for(k=1; k<nsteps; k++){
    	
 	vertical_step(upper_row, lower_row, &me);
 	cur = 1 - cur;
-   
+  
 #ifdef PRINT
 //	e_mutex_lock(0, 0, &mutex);	
 	data_copy(&local2smem, (Mailbox.pGrid + _Nelem*_Nside*me.row  + _Nside*me.col), me._grid); 
 //	e_mutex_unlock(0, 0, &mutex);	
-#endif
 
-	e_barrier(barriers, tgt_bars);
 
 	if (me.corenum == 0){
 		*ready = 0x00000001;		
- 		while( *go ==0) {};
+		while( *go ==0) {};
 			*go = 0;
 	}
-}   
+#endif
+
+}
+
+	if (me.corenum == 0){
+		*elapsed = E_CTIMER_MAX - e_ctimer_stop(E_CTIMER_0);   
+	}
+
 #ifndef PRINT
-	//copy last frame
+//copy last frame
+
 	data_copy(&local2smem, (Mailbox.pGrid + _Nelem*_Nside*me.row  + _Nside*me.col), me._grid); 
+	if (me.corenum == 0)
+		*ready = 0x00000001;		
+
+
 #endif
 	return 0;
 }

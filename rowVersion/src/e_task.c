@@ -11,7 +11,7 @@ char TB = 2 ;     /* top-to-bottom moving vehicle */
 
 core_t me;
 int cur = 0;
-int nrows= 16;
+int nrows= _Nelem / _Ncores;
 
 void horizontal_step(core_t *me)
 {
@@ -132,8 +132,8 @@ int main(void)
     me.col = e_group_config.core_col;
     me.corenum = me.row * e_group_config.group_cols + me.col;
    
-	e_neighbor_id(E_PREV_CORE, E_GROUP_WRAP, &me.rowv, &me.colv);
-    e_neighbor_id(E_NEXT_CORE, E_GROUP_WRAP, &me.rowvnext, &me.colvnext);
+	e_neighbor_id(E_PREV_CORE, E_GROUP_WRAP, &me.row_previous, &me.col_previous);
+    e_neighbor_id(E_NEXT_CORE, E_GROUP_WRAP, &me.row_next, &me.col_next);
     
 	Mailbox.pBase = (void *) e_emem_config.base;
     Mailbox.pGrid = Mailbox.pBase + offsetof(shared_buf_t, grid);
@@ -141,25 +141,27 @@ int main(void)
 
 	nsteps = *Mailbox.pNsteps;
 	
-	upper_core_grid =e_get_global_address(me.rowv, me.colv, &me._grid[1][0]);
-	lower_core_grid =e_get_global_address(me.rowvnext, me.colvnext, &me._grid[1][0]);
+	upper_core_grid =e_get_global_address(me.row_previous, me.col_previous, &me._grid[1][0]);
+	lower_core_grid =e_get_global_address(me.row_next, me.col_next, &me._grid[1][0]);
 	
 	e_barrier_init(barriers, tgt_bars);	
 
 	// Make sure DMA is inactive while setting descriptors
 	e_dma_wait(E_DMA_0);
 
-	smem2local.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
+	//smem2local.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE ;
+	smem2local.config = E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE ;
     smem2local.inner_stride = (0x04 << 16) | 0x04;
     smem2local.count = (0x01  << 16) | _Nelem*nrows >> 2 ;
     smem2local.outer_stride = (0x04 << 16) | 0x04; 
 
-    vneigh2local.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
+    //vneigh2local.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
+    vneigh2local.config =  E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
     vneigh2local.inner_stride = (0x04 << 16) | 0x04;
     vneigh2local.count = (0x01 << 16) | _Nelem >> 2;
     vneigh2local.outer_stride = (0x04 << 16) | 0x04;
 
-	local2smem.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
+	local2smem.config = E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
 	local2smem.inner_stride = (0x04 << 16) | 0x04;
 	local2smem.count = (0x01 << 16) | _Nelem*nrows >> 2;
 	local2smem.outer_stride = 0x04 | 0x04;	

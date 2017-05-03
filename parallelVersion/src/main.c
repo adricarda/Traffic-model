@@ -88,8 +88,11 @@ void bml_go(e_mem_t *pDRAM, int nsteps)
 	int i,j,k;
 	char buf[255];
 	unsigned done = 0;
+	unsigned timer = 0;
 
 	gettimeofday(&start, NULL);      
+
+#ifdef PRINT
 	for(k=1; k<nsteps; k++){
 		
 		while(1){
@@ -103,31 +106,44 @@ void bml_go(e_mem_t *pDRAM, int nsteps)
 		//read data
 
 //    	fprintf(stderr," iteration %d\n",k);
-#ifdef PRINT
 		addr = 0;
 		sz = sizeof(Mailbox);
 		e_read(pDRAM, 0, 0, addr, &Mailbox, sz);
 
 		snprintf(buf, 255, "out%05d.ppm",k);
 		dump_cur(buf, Mailbox.grid);
-#endif
 		e_write(&dev, 0, 0, 0x7000, &flag, sizeof(flag));
 
-	}
+	}	
 	gettimeofday(&stop, NULL);      
+#endif
+
+#ifndef PRINT
+
+		while(1){
+			e_read(&dev, 0, 0, 0x7010, &done, sizeof(unsigned));
+			if (done == 1){
+				break;
+			}
+		}	
+		
+		gettimeofday(&stop, NULL);      
+		addr = 0;
+		sz = sizeof(Mailbox);
+		e_read(pDRAM, 0, 0, addr, &Mailbox, sz);
+
+		snprintf(buf, 255, "out%05d.ppm",nsteps);
+		dump_cur(buf, Mailbox.grid);
+		e_write(&dev, 0, 0, 0x7000, &flag, sizeof(flag));
+#endif
 
 	elapsed = timedifference_msec(start, stop);
 	fprintf(stderr, "it took %f with %d steps\n",elapsed, nsteps);
 
-#ifndef PRINT
-	addr = 0;
-	sz = sizeof(Mailbox);
-	//fprintf(stderr, "iteration %d...\n", k);
-	e_read(pDRAM, 0, 0, addr, &Mailbox, sz);
+	e_read(&dev, 0, 0, 0x7020, &timer, sizeof(unsigned));
+	fprintf(stderr, "%u clock tick\n",timer);
 
-	snprintf(buf, 255, "out%05d.ppm", nsteps);
-	dump_cur(buf, Mailbox.grid);
-#endif
+
 }
 
 int main(int argc, char *argv[])
@@ -140,7 +156,7 @@ int main(int argc, char *argv[])
 	int result;
     size_t sz;
 	float prob = 0.3;
-    int nsteps = 256;
+    int nsteps = 512;
     msize = 0x00400000;
     if ( argc > 1 ) {
         nsteps = atoi(argv[1]);

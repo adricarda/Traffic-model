@@ -169,70 +169,40 @@ void setup( float p )
    top-to-bottom vehicles are shown in red. Empty cells are white. */
 
 void dump_cur( const char* filename )
-
 {
-
     int i, j;
-
     FILE *out = fopen( filename, "w" );
-
     if ( NULL == out ) {
-
         printf("Cannot create file %s\n", filename );
-
         abort();
-
     }
-
     fprintf(out, "P6\n");
-
     fprintf(out, "%d %d\n", SIZE, SIZE);
-
     fprintf(out, "255\n");
 
     for (i=0; i<SIZE; i++) {
-
         for (j=0; j<SIZE; j++) {
-
             switch( grid[cur][i][j] ) {
-
             case 0:
-
 //                fprintf(out, "%d ",0);
                 fprintf(out, "%c%c%c", 255, 255, 255);
-
                 break;
-
             case 1:
-
 //                fprintf(out, "%d ",1);
                 fprintf(out, "%c%c%c", 0, 0, 255);
-
                 break;
-
             case 2:
-
 //                fprintf(out, "%d ",2);
                 fprintf(out, "%c%c%c", 255, 0, 0);
-
                 break;
-
             default:
-
                 printf("Error: unknown cell state %u\n", grid[cur][i][j]);
-
                 abort();
-
             }
-
         }
-
 //    fprintf(out, "\n");
-
     }
-
     fclose(out);
-
 }
 
 
@@ -249,7 +219,7 @@ int main( int argc, char* argv[] )
 
     float prob = 0.3;
 
-    int nsteps = 256;
+    int nsteps = 512;
 
 
 
@@ -281,16 +251,15 @@ gettimeofday(&start, NULL);
 
         vertical_step();
        cur = 1 - cur;
-	 snprintf(buf, buflen, "out%05d.ppm",s);
+//	 snprintf(buf, buflen, "out%05d.ppm",s);
 
-	    dump_cur(buf);
+//	    dump_cur(buf);
 
 
     }
 	gettimeofday(&stop, NULL);
-//    snprintf(buf, buflen, "out%05d.ppm",nsteps);
-
-  //  dump_cur(buf);
+    snprintf(buf, buflen, "out%05d.ppm",nsteps);
+  dump_cur(buf);
 	elapsed = timedifference_msec(start, stop);	
 	fprintf(stderr, "it took %f\n",elapsed);
 

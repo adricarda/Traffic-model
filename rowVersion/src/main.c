@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 	int result;
     size_t sz;
 	float prob = 0.3;
-    int nsteps = 256;
+    int nsteps = 512;
     msize = 0x00400000;
     if ( argc > 1 ) {
         nsteps = atoi(argv[1]);

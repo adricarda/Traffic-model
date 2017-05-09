@@ -1,8 +1,8 @@
 #ifndef __STRUCT__
 #define __STRUCT__
-//#define PRINT
+#define PRINT
 
-#define _Ncores 16 
+#define _Ncores 16
 #define _Nelem 256
 #define _Nside 64
 

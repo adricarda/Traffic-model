@@ -41,16 +41,12 @@ void dump_cur( const char* filename, char *grid)
         for (j=0; j<_Nelem; j++) {
             switch( grid[i*_Nelem +j] ) {
             case 0:
-		
-   //            fprintf(out, "%d ",0);
              fprintf(out, "%c%c%c", 255, 255, 255);
                 break;
             case 1:
-   //             fprintf(out, "%d ",1);
                fprintf(out, "%c%c%c", 0, 0, 255);
                 break;
             case 2:
-       //        fprintf(out, "%d ",2);
                fprintf(out, "%c%c%c", 255, 0, 0);
                 break;
             default:
@@ -59,7 +55,6 @@ void dump_cur( const char* filename, char *grid)
             }
         
 		}
-//			fprintf(out, "\n");
     }
     fclose(out);
 }
@@ -105,7 +100,6 @@ void bml_go(e_mem_t *pDRAM, int nsteps)
 		}	
 		//read data
 
-//    	fprintf(stderr," iteration %d\n",k);
 		addr = 0;
 		sz = sizeof(Mailbox);
 		e_read(pDRAM, 0, 0, addr, &Mailbox, sz);
@@ -156,7 +150,7 @@ int main(int argc, char *argv[])
 	int result;
     size_t sz;
 	float prob = 0.3;
-    int nsteps = 512;
+    int nsteps = 1024;
     msize = 0x00400000;
     if ( argc > 1 ) {
         nsteps = atoi(argv[1]);
@@ -176,7 +170,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-	if ( e_open(&dev, 0, 0, platform.rows, platform.cols) )
+	if ( e_open(&dev, 0, 0, platform.rows, platform.cols))
     {
         fprintf(stderr, "\nERROR: Can't establish connection to Epiphany device!\n");
         exit(1);

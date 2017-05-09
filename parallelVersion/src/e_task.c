@@ -9,8 +9,8 @@ char EMPTY = 0;  /* empty cell                   */
 char LR = 1;     /* left-to-right moving vehicle */
 char TB = 2 ;     /* top-to-bottom moving vehicle */
 
-core_t me;
 int cur = 0;
+core_t me;
 
 void horizontal_step(char *firstColumn,char *lastColumn, core_t *me)
 {

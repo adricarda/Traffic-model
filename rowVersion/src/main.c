@@ -38,22 +38,15 @@ void dump_cur( const char* filename, char *grid)
     fprintf(out, "%d %d\n", _Nelem, _Nelem);
     fprintf(out, "255\n");
     for (i=0; i<_Nelem; i++) {
-		//			if (i%4 == 0)
-		//		fprintf(out, "\n core %d \n", i/4);
-
         for (j=0; j<_Nelem; j++) {
             switch( grid[i*_Nelem +j] ) {
             case 0:
-		
-          //     fprintf(out, "%d ",0);
              fprintf(out, "%c%c%c", 255, 255, 255);
                 break;
             case 1:
-   //             fprintf(out, "%d ",1);
                fprintf(out, "%c%c%c", 0, 0, 255);
                 break;
             case 2:
-       //        fprintf(out, "%d ",2);
                fprintf(out, "%c%c%c", 255, 0, 0);
                 break;
             default:
@@ -62,7 +55,6 @@ void dump_cur( const char* filename, char *grid)
             }
         
 		}
-		//	fprintf(out, "\n");
     }
     fclose(out);
 }
@@ -105,7 +97,6 @@ void bml_go(e_mem_t *pDRAM, int nsteps)
 		}	
 		//read data
 
-//    	fprintf(stderr," iteration %d\n",k);
 #ifdef PRINT
 		addr = 0;
 		sz = sizeof(Mailbox);
@@ -125,7 +116,6 @@ void bml_go(e_mem_t *pDRAM, int nsteps)
 #ifndef PRINT
 	addr = 0;
 	sz = sizeof(Mailbox);
-	//fprintf(stderr, "iteration %d...\n", k);
 	e_read(pDRAM, 0, 0, addr, &Mailbox, sz);
 
 	snprintf(buf, 255, "out%05d.ppm", nsteps);
@@ -142,8 +132,8 @@ int main(int argc, char *argv[])
     unsigned int addr;
 	int result;
     size_t sz;
-	float prob = 0.3;
-    int nsteps = 512;
+	float prob = 0.6;
+    int nsteps = 1024;
     msize = 0x00400000;
     if ( argc > 1 ) {
         nsteps = atoi(argv[1]);
@@ -191,7 +181,7 @@ int main(int argc, char *argv[])
 
   //Load program to cores
     fprintf(stderr, "Loading program on Epiphany chip...\n");
-    result = e_load_group("e_traffic.elf", &dev, 0, 0, platform.rows, platform.cols, E_FALSE);
+    result = e_load_group("e_traffic.elf", &dev, 0, 0,platform.rows, platform.cols, E_FALSE);
     if (result == E_ERR) {
         fprintf(stderr, "Error loading Epiphany program.\n");
         exit(1);

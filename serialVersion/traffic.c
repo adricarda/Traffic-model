@@ -128,37 +128,35 @@ void dump_cur( const char* filename )
     fclose(out);
 }
 
-int main( int argc, char* argv[] )
-{
+int main( int argc, char* argv[] ){
 	float elapsed;
-    const int buflen = 255;
-    int s;
-    char buf[buflen];
-    float prob = 0.3;
-    int nsteps = 1024;
-    if ( argc > 1 ) {
-        nsteps = atoi(argv[1]);
-    }
-    if ( argc > 2 ) {
-        prob = atof(argv[2]);
-    }
+	const int buflen = 255;
+	int s;
+	char buf[buflen];
+ 	float prob = 0.3;
+	int nsteps = 1024;
+	if ( argc > 1 ) {
+		nsteps = atoi(argv[1]);
+	}
+	if ( argc > 2 ) {
+		prob = atof(argv[2]);
+	}
 	setup(prob);
-    snprintf(buf, buflen, "out00000.ppm");
-    dump_cur(buf);
+	snprintf(buf, buflen, "out00000.ppm");
+	dump_cur(buf);
 	gettimeofday(&start, NULL);
 	for (s=1; s<nsteps; s++) {
-        horizontal_step();
-       	cur = 1 - cur;
-        vertical_step();
+		horizontal_step();
+		cur = 1 - cur;
+		vertical_step();
 		cur = 1 - cur;
 		snprintf(buf, buflen, "out%05d.ppm",s);
-//		dump_cur(buf);
+		//dump_cur(buf);
 	}
 	gettimeofday(&stop, NULL);
-    //snprintf(buf, buflen, "out%05d.ppm",nsteps);
+	//snprintf(buf, buflen, "out%05d.ppm",nsteps);
 	dump_cur(buf);
 	elapsed = timedifference_msec(start, stop);	
 	fprintf(stderr, "it took %f\n",elapsed);
-
-    return 0;
+	return 0;
 }

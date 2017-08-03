@@ -167,22 +167,23 @@ int main(void)
     me.row = e_group_config.core_row;
     me.col = e_group_config.core_col;
     me.corenum = me.row * e_group_config.group_cols + me.col;
-    e_neighbor_id(E_PREV_CORE, E_ROW_WRAP, &me.rowh, &me.colh);
-    e_neighbor_id(E_NEXT_CORE, E_ROW_WRAP, &me.rowhnext, &me.colhnext);
-    e_neighbor_id(E_PREV_CORE, E_COL_WRAP, &me.rowv, &me.colv);
-	e_neighbor_id(E_NEXT_CORE, E_COL_WRAP, &me.rowvnext, &me.colvnext);
-    
+   
+	e_neighbor_id(E_PREV_CORE, E_ROW_WRAP, &me.left_core_row, &me.left_core_column);
+	e_neighbor_id(E_NEXT_CORE, E_ROW_WRAP, &me.right_core_row, &me.right_core_column);
+	e_neighbor_id(E_PREV_CORE, E_COL_WRAP, &me.upper_core_row, &me.upper_core_column);
+	e_neighbor_id(E_NEXT_CORE, E_COL_WRAP, &me.lower_core_row, &me.lower_core_column);
+
 	Mailbox.pBase = (void *) e_emem_config.base;
     Mailbox.pGrid = Mailbox.pBase + offsetof(shared_buf_t, grid);
     Mailbox.pNsteps = Mailbox.pBase + offsetof(shared_buf_t, nsteps);
 
 	nsteps = *Mailbox.pNsteps;
 	
-	left_core_grid = e_get_global_address(me.rowh, me.colh, &me._grid[0][0]);
-	right_core_grid = e_get_global_address(me.rowhnext, me.colhnext, &me._grid[0][0]);
-	upper_core_grid =e_get_global_address(me.rowv, me.colv, &me._grid[1][0]);
-	lower_core_grid =e_get_global_address(me.rowvnext, me.colvnext, &me._grid[1][0]);
-	
+	left_core_grid = e_get_global_address(me.left_core_row, me.left_core_column, &me._grid[0][0]);
+	right_core_grid = e_get_global_address(me.right_core_row, me.right_core_column, &me._grid[0][0]);
+	upper_core_grid =e_get_global_address(me.upper_core_row, me.upper_core_column, &me._grid[1][0]);
+	lower_core_grid =e_get_global_address(me.lower_core_row, me.lower_core_column, &me._grid[1][0]);
+
 	e_barrier_init(barriers, tgt_bars);	
 
 	// Make sure DMA is inactive while setting descriptors
@@ -201,7 +202,7 @@ int main(void)
 
     vneigh2local.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;
     vneigh2local.inner_stride = (0x04 << 16) | 0x04;
-    vneigh2local.count = (0x01 << 16) | 0x0010;
+    vneigh2local.count = (0x01 << 16) | _Nside >> 2;
     vneigh2local.outer_stride = (0x04 << 16) | 0x04;
 
 	local2smem.config = E_DMA_MSGMODE | E_DMA_WORD | E_DMA_MASTER | E_DMA_ENABLE;

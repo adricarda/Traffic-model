@@ -103,7 +103,7 @@ void bml_go(e_mem_t *pDRAM, int nsteps)
 		addr = 0;
 		sz = sizeof(Mailbox);
 		e_read(pDRAM, 0, 0, addr, &Mailbox, sz);
-
+		printf("iteration %d\n",k);
 		snprintf(buf, 255, "out%05d.ppm",k);
 		dump_cur(buf, Mailbox.grid);
 		e_write(&dev, 0, 0, 0x7000, &flag, sizeof(flag));
@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
     }
 
 	if ( e_open(&dev, 0, 0, platform.rows, platform.cols))
+//	if ( e_open(&dev, 0, 0, 2,2))
     {
         fprintf(stderr, "\nERROR: Can't establish connection to Epiphany device!\n");
         exit(1);
@@ -198,7 +199,8 @@ int main(int argc, char *argv[])
 
   //Load program to cores
     fprintf(stderr, "Loading program on Epiphany chip...\n");
-    result = e_load_group("e_traffic.elf", &dev, 0, 0, platform.rows, platform.cols, E_FALSE);
+	result = e_load_group("e_traffic.elf", &dev, 0, 0, platform.rows, platform.cols, E_FALSE);
+    //result = e_load_group("e_traffic.elf", &dev, 0, 0, 2, 2, E_FALSE);
     if (result == E_ERR) {
         fprintf(stderr, "Error loading Epiphany program.\n");
         exit(1);

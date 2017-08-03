@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     unsigned int addr;
 	int result;
     size_t sz;
-	float prob = 0.6;
+	float prob = 0.3;
     int nsteps = 1024;
     msize = 0x00400000;
     if ( argc > 1 ) {
@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
     }
 
 	if ( e_open(&dev, 0, 0, platform.rows, platform.cols) )
+//	if ( e_open(&dev, 0, 0, 2, 2) )
     {
         fprintf(stderr, "\nERROR: Can't establish connection to Epiphany device!\n");
         exit(1);
@@ -179,9 +180,10 @@ int main(int argc, char *argv[])
 	snprintf(buf, 255, "out00000.ppm");
     dump_cur(buf, Mailbox.grid);
 
-  //Load program to cores
+	//Load program to cores
     fprintf(stderr, "Loading program on Epiphany chip...\n");
-    result = e_load_group("e_traffic.elf", &dev, 0, 0,platform.rows, platform.cols, E_FALSE);
+  	result = e_load_group("e_traffic.elf", &dev, 0, 0,platform.rows, platform.cols, E_FALSE);
+    //result = e_load_group("e_traffic.elf", &dev, 0, 0, 2, 2, E_FALSE);
     if (result == E_ERR) {
         fprintf(stderr, "Error loading Epiphany program.\n");
         exit(1);

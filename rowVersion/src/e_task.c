@@ -134,16 +134,16 @@ int main(void)
    
 	e_neighbor_id(E_PREV_CORE, E_GROUP_WRAP, &me.row_previous, &me.col_previous);
     e_neighbor_id(E_NEXT_CORE, E_GROUP_WRAP, &me.row_next, &me.col_next);
-    
+ 	upper_core_grid =e_get_global_address(me.row_previous, me.col_previous, &me._grid[1][0]);
+	lower_core_grid =e_get_global_address(me.row_next, me.col_next, &me._grid[1][0]);
+	   
 	Mailbox.pBase = (void *) e_emem_config.base;
     Mailbox.pGrid = Mailbox.pBase + offsetof(shared_buf_t, grid);
     Mailbox.pNsteps = Mailbox.pBase + offsetof(shared_buf_t, nsteps);
 
 	nsteps = *Mailbox.pNsteps;
 	
-	upper_core_grid =e_get_global_address(me.row_previous, me.col_previous, &me._grid[1][0]);
-	lower_core_grid =e_get_global_address(me.row_next, me.col_next, &me._grid[1][0]);
-	
+
 	e_barrier_init(barriers, tgt_bars);	
 
 	// Make sure DMA is inactive while setting descriptors
@@ -169,8 +169,6 @@ int main(void)
 //	e_mutex_lock(0, 0, &mutex);	
 	data_copy(&smem2local, &me._grid, (Mailbox.pGrid + _Nelem*nrows*me.corenum ));	
 //	e_mutex_unlock(0, 0, &mutex);	
-	e_barrier(barriers, tgt_bars);
-
 
 for(k=1; k<nsteps; k++){
 
@@ -193,13 +191,12 @@ for(k=1; k<nsteps; k++){
 //	e_mutex_unlock(0, 0, &mutex);	
 #endif
 
-	e_barrier(barriers, tgt_bars);
-
 	if (me.corenum == 0){
 		*ready = 0x00000001;		
  		while( *go ==0) {};
 			*go = 0;
 	}
+
 }   
 #ifndef PRINT
 	//copy last frame
@@ -207,5 +204,4 @@ for(k=1; k<nsteps; k++){
 #endif
 	return 0;
 }
-
 

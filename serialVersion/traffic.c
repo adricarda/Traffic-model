@@ -5,7 +5,7 @@
 
 /* The grid size is (SIZE x SIZE) */
 
-#define SIZE 256
+#define SIZE 128
 struct timeval stop, start;
 
 /* Possible values stored in a grid cell */
@@ -140,7 +140,7 @@ int main( int argc, char* argv[] )
     const int buflen = 255;
     int s;
     char buf[buflen];
-    float prob = 0.6;
+    float prob = 0.3;
     int nsteps = 1024;
     if ( argc > 1 ) {
         nsteps = atoi(argv[1]);
@@ -158,11 +158,11 @@ int main( int argc, char* argv[] )
         vertical_step();
 		cur = 1 - cur;
 		snprintf(buf, buflen, "out%05d.ppm",s);
-		dump_cur(buf);
+//		dump_cur(buf);
 	}
 	gettimeofday(&stop, NULL);
     //snprintf(buf, buflen, "out%05d.ppm",nsteps);
-	//dump_cur(buf);
+	dump_cur(buf);
 	elapsed = timedifference_msec(start, stop);	
 	fprintf(stderr, "it took %f\n",elapsed);
 

@@ -24,71 +24,64 @@ float timedifference_msec(struct timeval t0, struct timeval t1)
 
 /* Move all left-to-right vehicles that are not blocked */
 
-void horizontal_step( )
-{
-    int i, j;
-    const int next = 1 - cur;
-    for (i=0; i<SIZE; i++) {
-        for (j=0; j<SIZE; j++) {
-            const int left = (j > 0 ? j-1 : SIZE-1);
-            const int right = (j < SIZE-1 ? j+1 : 0);
-            if ( grid[cur][i][j] == EMPTY && grid[cur][i][left] == LR ) {
-                grid[next][i][j] = LR;
+void horizontal_step( ){
+	int i, j;
+	const int next = 1 - cur;
+	for (i=0; i<SIZE; i++) {
+		for (j=0; j<SIZE; j++) {
+			const int left = (j > 0 ? j-1 : SIZE-1);
+			const int right = (j < SIZE-1 ? j+1 : 0);
+			if ( grid[cur][i][j] == EMPTY && grid[cur][i][left] == LR ) {
+				grid[next][i][j] = LR;
             } else {
-                if ( grid[cur][i][j] == LR && grid[cur][i][right] == EMPTY ) {
-                    grid[next][i][j] = EMPTY;
-                } else {
-                    grid[next][i][j] = grid[cur][i][j];
-                }
-            }
-        }
+				if ( grid[cur][i][j] == LR && grid[cur][i][right] == EMPTY ) {
+					grid[next][i][j] = EMPTY;
+				} else {
+					grid[next][i][j] = grid[cur][i][j];
+				}
+			}
+		}
     }
 }
 
 /* Move all top-to-bottom vehicles that are not blocked */
-void vertical_step( void )
-{
-    int i, j;
-    const int next = 1 - cur;
-    for (i=0; i<SIZE; i++) {
-        const int top = (i > 0 ? i-1 : SIZE-1);
-        const int bottom = (i < SIZE-1 ? i+1 : 0);
-        for (j=0; j<SIZE; j++) {
-            if ( grid[cur][i][j] == EMPTY && grid[cur][top][j] == TB ) {
-                grid[next][i][j] = TB;
-            } else {
-                if ( grid[cur][i][j] == TB && grid[cur][bottom][j] == EMPTY) {
-                    grid[next][i][j] = EMPTY;
-                } else {
-                    grid[next][i][j] = grid[cur][i][j];
-                }
-            }
-        }
-    }
+void vertical_step( void ){
+	int i, j;
+	const int next = 1 - cur;
+	for (i=0; i<SIZE; i++) {
+		const int top = (i > 0 ? i-1 : SIZE-1);
+		const int bottom = (i < SIZE-1 ? i+1 : 0);
+		for (j=0; j<SIZE; j++) {
+			if ( grid[cur][i][j] == EMPTY && grid[cur][top][j] == TB ) {
+				grid[next][i][j] = TB;
+			} else {
+				if ( grid[cur][i][j] == TB && grid[cur][bottom][j] == EMPTY) {
+					grid[next][i][j] = EMPTY;
+				} else {
+					grid[next][i][j] = grid[cur][i][j];
+				}
+			}
+		}
+	}
 }
 
 /* Returns 1 with probability p */
-int rand01( float p )
-{
-    return ((rand() / (float)RAND_MAX) < p);
+int rand01( float p ){
+	return ((rand() / (float)RAND_MAX) < p);
 }
 
-/* Randomly initialize grid[cur][][] with vehicles with density p.
-   For each vehicle, its direction (left-to-right or top-to-bottom) is
-   chosen with equal probability. */
-void setup( float p )
-{
-    int i, j;
-    cur = 0;
-    for ( i=0; i<SIZE; i++ ) {
-        for ( j=0; j<SIZE; j++) {
-            if ( rand01( p ) ) {
-                grid[cur][i][j] = ( rand01(0.5) ? LR : TB );
-            } else {
-                grid[cur][i][j] = EMPTY;
-            }
-        }
-    }
+void setup( float p ){
+	int i, j;
+	cur = 0;
+	for ( i=0; i<SIZE; i++ ) {
+		for ( j=0; j<SIZE; j++) {
+			if ( rand01( p ) ) {
+				grid[cur][i][j] = ( rand01(0.5) ? LR : TB );
+			} else {
+				grid[cur][i][j] = EMPTY;
+			}
+		}
+	}
 }
 
 /* Dump grid[cur][][] as a PPM (Portable PixMap) image written to file
@@ -97,35 +90,35 @@ void setup( float p )
 
 void dump_cur( const char* filename )
 {
-    int i, j;
-    FILE *out = fopen( filename, "w" );
-    if ( NULL == out ) {
-        printf("Cannot create file %s\n", filename );
-        abort();
-    }
-    fprintf(out, "P6\n");
-    fprintf(out, "%d %d\n", SIZE, SIZE);
-    fprintf(out, "255\n");
+	int i, j;
+	FILE *out = fopen( filename, "w" );
+	if ( NULL == out ) {
+		printf("Cannot create file %s\n", filename );
+		abort();
+	}
+	fprintf(out, "P6\n");
+	fprintf(out, "%d %d\n", SIZE, SIZE);
+	fprintf(out, "255\n");
 
-    for (i=0; i<SIZE; i++) {
-        for (j=0; j<SIZE; j++) {
-            switch( grid[cur][i][j] ) {
-            case 0:
-                fprintf(out, "%c%c%c", 255, 255, 255);
-                break;
-            case 1:
-                fprintf(out, "%c%c%c", 0, 0, 255);
-                break;
-            case 2:
-                fprintf(out, "%c%c%c", 255, 0, 0);
-                break;
-            default:
-                printf("Error: unknown cell state %u\n", grid[cur][i][j]);
-                abort();
-            }
-        }
-    }
-    fclose(out);
+	for (i=0; i<SIZE; i++) {
+ 		for (j=0; j<SIZE; j++) {
+ 			switch( grid[cur][i][j] ) {
+			case 0:
+				fprintf(out, "%c%c%c", 255, 255, 255);
+				break;
+			case 1:
+				fprintf(out, "%c%c%c", 0, 0, 255);
+				break;
+			case 2:
+				fprintf(out, "%c%c%c", 255, 0, 0);
+				break;
+			default:
+				printf("Error: unknown cell state %u\n", grid[cur][i][j]);
+				abort();
+			}
+		}
+	}
+	fclose(out);
 }
 
 int main( int argc, char* argv[] ){

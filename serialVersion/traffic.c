@@ -3,7 +3,6 @@
 #include <omp.h>
 #include <sys/time.h>
 
-/* The grid size is (SIZE x SIZE) */
 
 #define SIZE 128
 struct timeval stop, start;
@@ -13,11 +12,6 @@ struct timeval stop, start;
 char  TB = 2;      /* top-to-bottom moving vehicle */
 char  LR = 1;     /* left-to-right moving vehicle */
 char  EMPTY = 0;  /* empty cell                   */
-/* global variables */
-
-/* grid[cur][][] is the current grid; grid[1-cur][][] is the updated
-
-   grid. */
 
 int cur = 0;
 

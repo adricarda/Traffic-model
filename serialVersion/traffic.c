@@ -1,3 +1,63 @@
+/****************************************************************************
+ *
+ * traffic.c - Cellular Automata traffic simulator
+ *
+ * Written in 2017 by Moreno Marzolla <moreno.marzolla(at)unibo.it>
+ *
+ * To the extent possible under law, the author(s) have dedicated all 
+ * copyright and related and neighboring rights to this software to the 
+ * public domain worldwide. This software is distributed without any warranty.
+ *
+ * You should have received a copy of the CC0 Public Domain Dedication
+ * along with this software. If not, see 
+ * <http://creativecommons.org/publicdomain/zero/1.0/>. 
+ *
+ * ---------------------------------------------------------------------------
+ *
+ * This program implements the Biham-Middleton-Levine traffic model
+ * (see
+ * https://en.wikipedia.org/wiki/Biham%E2%80%93Middleton%E2%80%93Levine_traffic_model
+ * for details). THe BML traffic model is a simple three-state
+ * two-dimensional cellular automata over a toroidal square space.
+ * Initially, each cell is either empty, or occupied by a
+ * left-to-right or top-to-bottom moving vehicle. The model evolves at
+ * discrete time steps. At each step, vehicles move one position left
+ * or down (depending on the type of vehicle) provided that the
+ * destination cell is empty. Each step is logically divided into two
+ * phases: in the first phase only left-to-right vehicles move;
+ * in the second phase, only top-to-bottom vehicles move. If the
+ * inital density of vehicles is large enough, a giant traffic jam may
+ * appear, preventing any further movement. For low initial density,
+ * the system self-organize to allow a constant flow of vehicles.
+ *
+ * Compile with:
+ *
+ * gcc -fopenmp -O2 -std=c99 -Wall -Wpedantic traffic.c -o traffic
+ *
+ * Run with:
+ *
+ * ./traffic [nsteps [prob]]
+ *
+ * Example:
+ *
+ * ./traffic 1024 0.3
+ * 
+ * where nsteps is the number of simulation steps to execute, and prob
+ * is the initial probability that a cell is occupied by a vehicle
+ * (occupied cells are initialized with equal probability with a
+ * top-down or left-right vehicle). Default: nsteps=256 prob=0.2
+ *
+ * For each step, a file called outNNNNN.ppm is generated, where NNNNN
+ * is the step number (starts from 0). At the end of the simulation,
+ * it is possible to display a movie with:
+ *
+ * animate -resize 512x512 *.ppm
+ *
+ * To make a movie with avconv (ex ffmpeg):
+ *
+ * avconv -i "out%05d.ppm" -vcodec mpeg4 -s 512x512 traffic.avi
+ *
+ ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>

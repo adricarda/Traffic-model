@@ -12,14 +12,12 @@ char TB = 2 ;     /* top-to-bottom moving vehicle */
 int cur = 0;
 core_t me;
 
-void horizontal_step(char *firstColumn,char *lastColumn, core_t *me)
-{
+void horizontal_step(char *firstColumn,char *lastColumn, core_t *me) {
 	int i, j;
     const int next = 1 - cur;
 
 	//update first column
-	for (i=0; i<_Nside; i++)
-	{
+	for (i=0; i<_Nside; i++) {
 		if (me->_grid[cur][i*_Nside] == EMPTY && firstColumn[i] == LR ) {
 			me->_grid[next][i*_Nside] = LR;
         }
@@ -39,8 +37,7 @@ void horizontal_step(char *firstColumn,char *lastColumn, core_t *me)
             if ( me->_grid[cur][i*_Nside+j] == EMPTY && me->_grid[cur][i*_Nside+left] == LR ) {
                 me->_grid[next][i*_Nside+j] = LR;
             }
-            else
-			{
+            else {
            		if (me->_grid[cur][i*_Nside+j] == LR && me->_grid[cur][i*_Nside+right] == EMPTY) {
 					me->_grid[next][i*_Nside+j] = EMPTY;
                 } else
@@ -51,8 +48,7 @@ void horizontal_step(char *firstColumn,char *lastColumn, core_t *me)
 
 	//update last column
 	j=_Nside-1;	
-	for (i=0; i<_Nside; i++)
-    {
+	for (i=0; i<_Nside; i++) {
         if (me->_grid[cur][i*_Nside+j ] == EMPTY && me->_grid[cur][i*_Nside+j-1] == LR ) {
             me->_grid[next][i*_Nside+j] = LR;
         }
@@ -67,8 +63,7 @@ void horizontal_step(char *firstColumn,char *lastColumn, core_t *me)
 
 }
 
-void vertical_step( char *firstRow, char *lastRow, core_t *me)
-{
+void vertical_step( char *firstRow, char *lastRow, core_t *me) {
     int i, j;
     const int next = 1 - cur;
 	//update first row
@@ -89,8 +84,7 @@ void vertical_step( char *firstRow, char *lastRow, core_t *me)
 	for (i=1; i<_Nside-1; i++) {
         const int top = i-1;
         const int bottom = i+1;
-        for (j=0; j<_Nside; j++)
-		{
+        for (j=0; j<_Nside; j++) {
 			if (me->_grid[cur][i*_Nside+j] == EMPTY && me->_grid[cur][top*_Nside+j] == TB ) {
                     me->_grid[next][i*_Nside+j] = TB;
             }
@@ -105,10 +99,8 @@ void vertical_step( char *firstRow, char *lastRow, core_t *me)
     }
 	//update last row
 	i=_Nside-1;
-	for(j=0; j<_Nside; j++)
-	{
-		if (me->_grid[cur][i*_Nside+j] == EMPTY && me->_grid[cur][(i-1)*_Nside+j] == TB )
-		{
+	for(j=0; j<_Nside; j++) {
+		if (me->_grid[cur][i*_Nside+j] == EMPTY && me->_grid[cur][(i-1)*_Nside+j] == TB ) {
 			me->_grid[next][i*_Nside+j] = TB;
 		}
 		else {
@@ -121,8 +113,7 @@ void vertical_step( char *firstRow, char *lastRow, core_t *me)
 
 }
 
-void data_copy(e_dma_desc_t *dma_desc, void *dst, void *src)
-{
+void data_copy(e_dma_desc_t *dma_desc, void *dst, void *src) {
 	// Make sure DMA is inactive before modifying the descriptor
 	e_dma_wait(E_DMA_0);
 	dma_desc->src_addr = src;
@@ -135,8 +126,7 @@ void data_copy(e_dma_desc_t *dma_desc, void *dst, void *src)
 	return;
 }
 
-int main(void)
-{
+int main(void) {
 	volatile shared_buf_ptr_t Mailbox;
     int nsteps;
     e_dma_desc_t smem2local ;
@@ -242,7 +232,7 @@ for(k=1; k<nsteps; k++){
 //	e_mutex_unlock(0, 0, &mutex);	
 
 
-	if (me.corenum == 0){
+	if (me.corenum == 0) {
 		*ready = 0x00000001;		
 		while( *go ==0) {};
 			*go = 0;
@@ -251,7 +241,7 @@ for(k=1; k<nsteps; k++){
 
 }
 
-	if (me.corenum == 0){
+	if (me.corenum == 0) {
 		*elapsed = E_CTIMER_MAX - e_ctimer_stop(E_CTIMER_0);   
 	}
 

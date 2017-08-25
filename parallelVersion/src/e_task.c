@@ -209,7 +209,6 @@ int main(void) {
 	e_ctimer_start(E_CTIMER_0, E_CTIMER_CLK);
 
 for(k=1; k<nsteps; k++){
-
 	e_barrier(barriers, tgt_bars);
 	
 	data_copy(&hneigh2local, left_column, left_core_grid+_Nside-1);

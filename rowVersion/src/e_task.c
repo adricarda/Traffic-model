@@ -81,7 +81,7 @@ void vertical_step( char *firstRow, char *lastRow, core_t *me) {
 	}
 }
 
-void data_copy(e_dma_desc_t *dma_desc, void *dst, void *src {
+void data_copy(e_dma_desc_t *dma_desc, void *dst, void *src) {
 	// Make sure DMA is inactive before modifying the descriptor
 	e_dma_wait(E_DMA_0);
 	dma_desc->src_addr = src;
